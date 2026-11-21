@@ -1,0 +1,36 @@
+# Palletizing parameters — ALL values below are PLACEHOLDERS.
+# Measure the real values in the cell (conveyor pick point, pallet corner,
+# box size, track travel) before trusting any demo result.
+# See docs/notes.md and the node docstrings.
+
+vision_node:
+  ros__parameters:
+    camera_topic: /camera/image_raw
+    threshold_value: 127
+    min_contour_area: 100.0
+    invert: true          # dark box on a light conveyor
+    camera_frame: camera_frame  # TBD: real TF frame name
+
+conveyor_interface:
+  ros__parameters:
+    auto_stop_on_detect: true
+
+palletizing_demo:
+  ros__parameters:
+    rows: 2               # TBD: pallet pattern
+    cols: 3               # TBD: pallet pattern
+    layers: 2             # TBD: pallet pattern
+    box_size: [0.05, 0.05, 0.05]  # TBD, metres (x, y, z)
+    box_gap: 0.01         # TBD, metres between boxes on the pallet
+    approach_height: 0.10 # TBD, metres above pick/place
+    layer_height: 0.05    # TBD, == box height
+    # Pick pose [x, y, z, roll, pitch, yaw] in base_link — TBD: measure it.
+    pick_pose: [0.35, 0.0, 0.10, 0.0, 1.5708, 0.0]
+    # Pallet origin (first slot corner) [x, y, z, roll, pitch, yaw] — TBD.
+    place_origin: [0.0, -0.30, 0.0, 0.0, 1.5708, 0.0]
+    # Home joints [joint_7, joint_1..joint_6] — TBD safe pose.
+    home_joint_values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    gripper_open_position: 0.01   # TBD, metres (MHF2 finger travel)
+    gripper_closed_position: 0.0  # TBD, metres
+    velocity_scaling: 0.3
+    dry_run: false        # false now that ar4_moveit_config exists; set true to simulate plans without moving the robot
