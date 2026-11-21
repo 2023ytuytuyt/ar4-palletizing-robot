@@ -55,8 +55,10 @@ palletized. The size/weight of the palletizing boxes is still unknown.
 3. **Track travel length** — 0.45 m in the URDF is an ESTIMATE (rail 500 mm,
    blocks 39 mm, end supports 452 mm apart); confirm from the two
    limit-switch positions.
-4. **MHF2 gripper STLs** — the gripper is NOT in this RAR. Export
-   `Misc Parts/MHF2-8D1.SLDASM` (from `last dance.zip`) to STL, or use its
-   STEP export.
+4. **3-Claw gripper STLs** — the gripper is in `at.rar` (Drive, 2026-11-21):
+   `3-Claw Gripper Assembly.SLDASM` + Housing, Guide Plate, Jaws x3, Scroll Disc,
+   SG90 servo. Export with `ExportSTL.bas` (open the gripper assembly, run the
+   macro) — the STLs land in `C:\meshes`. Then wire them into the URDF,
+   replacing the two placeholder finger joints with three jaw joints.
 5. **Palletizing box size/weight** — the small boxes to be palletized (cm + grams).
 6. **Pallet pattern** — boxes per row, number of layers.

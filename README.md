@@ -1,6 +1,6 @@
 # AR4 Palletizing Robot — ROS 2 Simulation
 
-> **ملخص عربي:** مشروع تخرج — ذراع روبوت AR4 بستة محاور دوّارة مركّب على محور سابع خطي (تراك ألومنيوم + ball screw) لرصّ صناديق صغيرة جدًا جاية على سير ناقل، مع جريبر SMC MHF2-8D1 بصابعين. المشروع ده سيميوليشن ROS 2 (Jazzy) الأول، والهاردوير ييجي بعدين.
+> **ملخص عربي:** مشروع تخرج — ذراع روبوت AR4 بستة محاور دوّارة مركّب على محور سابع خطي (تراك ألومنيوم + ball screw) لرصّ صناديق صغيرة جدًا جاية على سير ناقل، مع جريبر 3-Claw gripper (SG90 servo) بصابعين. المشروع ده سيميوليشن ROS 2 (Jazzy) الأول، والهاردوير ييجي بعدين.
 
 ## What this is
 
@@ -8,7 +8,7 @@ A ROS 2 (Jazzy) simulation of a palletizing robot arm for the graduation project
 
 - **6-axis AR4 arm** (Annin Robotics AR4, 3D-printed parts) for pick-and-place
 - **7th axis: linear track** — aluminium extrusion rail + ball screw, moving the whole arm along the pallet row
-- **Gripper: SMC MHF2-8D1**, two-finger pneumatic gripper
+- **Gripper: 3-Claw servo gripper (SG90)**, three jaws, self-centering
 - **Conveyor + computer vision** — very small boxes arrive on a conveyor; a fixed camera + classical OpenCV (threshold, contours, ArUco) locates each box before picking
 - **Stack:** ROS 2 Jazzy, URDF/Xacro, RViz, Gazebo, MoveIt 2, ros2_control
 
@@ -18,7 +18,7 @@ A ROS 2 (Jazzy) simulation of a palletizing robot arm for the graduation project
 |---|---|
 | Arm | AR4, 6 revolute joints (J1–J6) |
 | 7th axis | Prismatic joint on a linear track (ball screw). Travel length: **TBD — measure from SolidWorks** (0.8 m in the URDF is only a placeholder) |
-| Gripper | SMC MHF2-8D1, two-finger pneumatic |
+| Gripper | 3-Claw servo gripper (SG90), three jaws, self-centering |
 | Boxes | Very small — exact dimensions/weight TBD |
 | Vision | Fixed USB camera above the pick point (eye-to-hand), OpenCV via cv_bridge |
 | Control (later) | Teensy 4.1 + AR4HardwareInterface, JointTrajectoryController at 60 Hz |
@@ -101,7 +101,7 @@ ros2 launch ar4_palletizing palletizing_demo.launch.py
 - [ ] Exact box dimensions (cm) and weight
 - [ ] Actual 7th-axis track travel length (measure from SolidWorks — replace the 0.8 m placeholder)
 - [ ] Pallet pattern (boxes per row, number of layers)
-- [ ] MHF2 pneumatic supply: compressor/air source, solenoid valve, regulator, hoses
+- [ ] SG90 servo wiring + jaw open/close angles (see docs/hardware-checklist.md §4)
 - [ ] Power supply for the arm + track motor
 - [ ] Emergency stop
 - [ ] Limit switches at both ends of the track

@@ -7,7 +7,8 @@ with the real design from `last dance.zip` (assembly `01-last one.SLDASM`):
 
 1. In SolidWorks, open the assembly and **save each link as its own part**:
    base carriage, turret (J1), upper arm (J2), forearm (J3), wrist roll (J4),
-   wrist bend (J5), flange (J6), gripper body + the two MHF2 fingers.
+   wrist bend (J5), flange (J6), gripper body + the placeholder 3-Claw fingers
+   (the real gripper has three jaws).
 2. For each part: **File → Save As → STL** (binary, fine resolution) or **STEP
    AP214**. STL is simplest for RViz/Gazebo; STEP keeps more detail but needs
    conversion (e.g. `assimp` / FreeCAD) before Gazebo can use it.
@@ -67,9 +68,9 @@ no real hardware needed); later swap the mock for the real
 ## 4. Gripper fingers
 
 `finger_left_joint` / `finger_right_joint` are prismatic joints. In the real
-system the MHF2 is pneumatic (open/close, not position-controlled), so in
-ros2_control they are best driven by a simple on/off (or a `GripperActionController`
-later). In simulation they can stay as position joints for now.
+system the 3-Claw is servo-driven (SG90, position-controlled), so in
+ros2_control they are driven by position commands to the servo (or a
+`GripperActionController` later). In simulation they can stay as position joints for now.
 
 ## 5. Conveyor + vision (later)
 

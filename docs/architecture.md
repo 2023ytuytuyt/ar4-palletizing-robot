@@ -73,7 +73,7 @@ without changing the layers above it.
          │  Mock Components │              │  Teensy 4.1 +    │
          │  world: track,   │              │  AR4Hardware-    │
          │  conveyor,       │              │  Interface,      │
-         │  pallet, boxes   │              │  MHF2 pneumatics │
+         │  pallet, boxes   │              │  SG90 servo        │
          └──────────────────┘              └──────────────────┘
 ```
 
@@ -93,7 +93,7 @@ See [urdf-guide.md](urdf-guide.md) for the full joint/link chain.
 
 | Package | Status | What it does |
 |---|---|---|
-| `ar4_description` | **Exists** | URDF/Xacro of the arm + track + MHF2 gripper, RViz launch (`view_robot.launch.py`) |
+| `ar4_description` | **Exists** | URDF/Xacro of the arm + track + 3-Claw gripper, RViz launch (`view_robot.launch.py`) |
 | `ar4_bringup` | **Exists (skeleton)** | Gazebo launch (`gazebo.launch.py`) — spawns the URDF in an empty world; conveyor/pallet/boxes worlds come later |
 | `ar4_moveit_config` | Done | MoveIt 2 config: SRDF (planning groups `ar4_arm`, `gripper`), kinematics, OMPL planner config, `move_group` launch |
 | `ar4_control` | Done | ros2_control config: JointTrajectoryController (joints `joint_7`, `joint_1`–`joint_6`), joint state broadcaster, gripper controller; Mock Components for simulation, AR4HardwareInterface for real hardware |
@@ -121,8 +121,8 @@ them in that order (description → control → MoveIt → Gazebo world → visi
    while the arm moves.
 4. **Execute pick.** MoveIt sends the trajectory to the JointTrajectoryController.
    ros2_control executes it (in Gazebo now, on the Teensy later). The gripper
-   closes (`finger_left_joint` / `finger_right_joint` — in reality a pneumatic
-   on/off command to the MHF2 solenoid valve).
+   closes (placeholder finger joints — in reality a servo position command to
+   the SG90).
 5. **Plan place.** The palletizing node looks up the next free slot in the
    pallet pattern (pattern still TBD) and sends the place pose to MoveIt. The
    plan moves the arm up, slides `joint_7` along the track to the right

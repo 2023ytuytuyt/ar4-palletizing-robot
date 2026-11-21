@@ -28,7 +28,7 @@ world
                       └─ joint_4 (revolute, axis Z) ── link4 [wrist roll]
                            └─ joint_5 (revolute, axis Y) ── link5 [wrist bend]
                                 └─ joint_6 (revolute, axis Z) ── link6 [flange]
-                                     └─ gripper_fixed (fixed) ── gripper_base [MHF2 body]
+                                     └─ gripper_fixed (fixed) ── gripper_base [3-Claw body]
                                           ├─ finger_left_joint (prismatic, axis -Y) ── finger_left
                                           └─ finger_right_joint (prismatic, axis +Y) ── finger_right
 ```
@@ -56,8 +56,8 @@ Rules that must stay true when you edit the file:
 - `joint_7` moves the **whole arm** along X. Its `lower` limit is 0 and its
   `upper` limit is the track travel — the arm starts at one end of the track.
 - The gripper fingers slide along Y and close towards each other. In the real
-  system the MHF2 is pneumatic (open/close), so the finger joints are
-  position joints in simulation only.
+  system the 3-Claw is servo-driven (SG90), so the finger joints are position
+  joints in simulation and in reality.
 
 ## 3. Xacro properties — full list
 
@@ -78,7 +78,7 @@ the SolidWorks design. Each is marked `MEASURE FROM SOLIDWORKS` in the file.
 | `link1_radius` | 0.07 (m) | Turret radius |
 | `link2_width` / `link3_width` | 0.06 / 0.05 (m) | Upper arm / forearm width |
 | `wrist_radius` | 0.035 (m) | Wrist link radius |
-| `gripper_body_x` / `gripper_body_y` / `gripper_body_z` | 0.04 / 0.05 / 0.04 (m) | MHF2 gripper body size |
+| `gripper_body_x` / `gripper_body_y` / `gripper_body_z` | 0.04 / 0.05 / 0.04 (m) | 3-Claw gripper body size |
 | `finger_length` | 0.03 (m) | Finger length |
 | `finger_width` | 0.008 (m) | Finger width |
 | `finger_gap` | 0.02 (m) | Half-distance between fingers when open |
@@ -101,7 +101,7 @@ from `last dance.zip` (assembly `01-last one.SLDASM`):
 1. **Split the assembly into one part per link.** In SolidWorks, open the
    assembly and save each link as its own part: base carriage, turret (J1),
    upper arm (J2), forearm (J3), wrist roll (J4), wrist bend (J5), flange
-   (J6), gripper body + the two MHF2 fingers.
+   (J6), gripper body + the placeholder 3-Claw fingers (real gripper: three jaws).
 2. **Export each part as STL** (binary, fine resolution). Use **File → Save
    As → STL**. STEP AP214 also works but needs conversion (e.g. `assimp` or
    FreeCAD) before Gazebo can use it — STL is simplest for RViz/Gazebo.
@@ -165,6 +165,6 @@ from `last dance.zip` (assembly `01-last one.SLDASM`):
   bug.
 - **Moving joint origins to fix a mesh.** Fix the mesh `<origin>` instead;
   joint origins define the kinematics.
-- **Forgetting the fingers.** The MHF2 fingers are separate links with their
+- **Forgetting the fingers.** The 3-Claw fingers are separate links with their
   own joints. If you replace the gripper body mesh, replace the finger meshes
   too, or the fingers will float in the wrong place.

@@ -11,7 +11,7 @@ is decided, or you will redo it.
 | # | Item | Status | Blocks |
 |---|---|---|---|
 | 1.1 | **Box dimensions** (length × width × height, in cm) | ⏳ OPEN | Gripper finger gap and closing travel; pallet slot size; box model in Gazebo; `minAreaRect` size checks in vision |
-| 1.2 | **Box weight** (grams) | ⏳ OPEN | Whether the MHF2 grip is strong enough; arm payload check; Gazebo box mass |
+| 1.2 | **Box weight** (grams) | ⏳ OPEN | Whether the 3-Claw grip is strong enough; arm payload check; Gazebo box mass |
 | 1.3 | **Box material / surface** (cardboard? plastic? smooth?) | ⏳ OPEN | Friction between fingers and box — smooth plastic needs more grip force than cardboard |
 
 ## 2. The 7th axis (linear track)
@@ -32,14 +32,13 @@ is decided, or you will redo it.
 | 3.2 | **Pallet size and position** (fixed, measured in the cell) | ⏳ OPEN | Pallet frame in TF; collision object in MoveIt; Gazebo world |
 | 3.3 | **Box spacing on the pallet** (gap between boxes) | ⏳ OPEN | Place pose calculation; finger clearance when placing next to an already-placed box |
 
-## 4. Gripper pneumatics (SMC MHF2-8D1)
+## 4. Gripper servo (3-Claw, SG90)
 
 | # | Item | Status | Blocks |
 |---|---|---|---|
-| 4.1 | **Compressor / air source** (which one, pressure in bar) | ⏳ OPEN | Whether the gripper can close at all on the real robot |
-| 4.2 | **Solenoid valve** (which model, how it is driven) | ⏳ OPEN | ros2_control gripper interface (on/off output); wiring to the Teensy |
-| 4.3 | **Pressure regulator** | ⏳ OPEN | Grip force — too much pressure crushes a small box, too little drops it |
-| 4.4 | **Hoses and fittings** (diameter, routing along the arm) | ⏳ OPEN | Hose routing must not limit joint motion — check in the real assembly |
+| 4.1 | **SG90 servo wiring** (PWM pin on the Teensy, 5 V supply) | ⏳ OPEN | Gripper control on the real robot |
+| 4.2 | **Jaw open/close angles** (servo angles for open vs closed on the real box size) | ⏳ OPEN | ros2_control gripper interface; grip force check |
+| 4.3 | **Grip force check** (SG90 stall ~1.8 kg·cm — enough for the box weight?) | ⏳ OPEN | Whether the gripper can hold the box; needs the box weight (1.2) |
 
 ## 5. Power and safety
 
@@ -72,7 +71,7 @@ is decided, or you will redo it.
    config, vision tuning, or the demo code).
 2. Decide items in this order: box (1) → track travel (2.1) → pallet pattern
    (3.1) → conveyor behaviour (7.1). Those four unlock almost all the
-   simulation work; pneumatics, power and safety unlock the hardware work.
+   simulation work; servo, power and safety unlock the hardware work.
 3. Keep this file as the single source of truth for "what is still unknown".
    If a value appears in code or docs, it must match a ✅ DECIDED row here —
    otherwise it is a placeholder.

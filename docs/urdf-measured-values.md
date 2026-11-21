@@ -75,7 +75,7 @@ uses.
 | link4 (J4) | 0.192 | motor 17LS13 0.070, Turret Housing 0.058 |
 | link5 (J5) | 0.320 | side cover cap 0.095, Housing 0.084, motor 11HS20 0.065 |
 | link6 (J6) | 0.123 | main bearing arm 0.075, housing 0.024 |
-| gripper (MHF2) | 0.10 | SMC catalogue value — not yet measured |
+| gripper (3-Claw) | 0.10 | placeholder — SG90 is 9 g, printed parts unmeasured |
 | **arm total** | **~3.1** | (without track; track subassembly Assem2 = 2.454 kg) |
 
 Centres of mass and inertias in the URDF are the mass-weighted values from
@@ -121,9 +121,10 @@ the FK check above). Consequences:
       that the wrist pitch looks right.
 - [ ] J6 frame: axis from the gripper-mount local-Z; centre = gripper-mount
       origin. Same RViz check.
-- [ ] MHF2 gripper: export an STL from `MHF2-8D1.SLDASM` (run `ExportSTL.bas`
-      with that assembly open) and replace the placeholder gripper boxes;
-      measure its mass (catalogue says ~0.10 kg).
+- [ ] 3-Claw gripper: export STLs from `3-Claw Gripper Assembly.SLDASM` (run `ExportSTL.bas`
+      with that assembly open) and replace the placeholder gripper boxes and the
+      two placeholder finger joints with three jaw joints; measure its mass
+      (SG90 9 g + printed parts).
 - [ ] Meshes: verify in RViz that all 17 STLs sit correctly on their links.
       A wrong local frame shows up immediately as a floating/misplaced part.
 - [ ] Joint limits: replace the placeholder ±limits with the AR4 values.

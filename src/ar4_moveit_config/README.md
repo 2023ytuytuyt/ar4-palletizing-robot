@@ -8,7 +8,7 @@ MoveIt 2 planning configuration for the AR4 palletizing robot
 | Group | Joints | Purpose |
 |---|---|---|
 | `ar4_arm` | `joint_7` (prismatic track) + `joint_1`…`joint_6` (revolute) | One planning group for the whole arm + track |
-| `gripper` | `finger_left_joint`, `finger_right_joint` | MHF2 two-finger gripper |
+| `gripper` | `finger_left_joint`, `finger_right_joint` (placeholder — real gripper has three jaws) | 3-Claw servo gripper |
 
 The 7th axis is **inside** `ar4_arm` on purpose (see `docs/notes.md`): MoveIt
 then plans arm + track motion **together** in a single plan. That is what
@@ -20,7 +20,7 @@ every box.
 The track is slow (ball screw), so `joint_7` has deliberately low
 velocity/acceleration limits in `config/joint_limits.yaml`.
 
-End effector: `mhf2_gripper` (parent link `link6`, group `gripper`).
+End effector: `claw_gripper` (parent link `link6`, group `gripper`).
 
 ## Files
 

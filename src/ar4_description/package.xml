@@ -3,7 +3,7 @@
 <package format="3">
   <name>ar4_description</name>
   <version>0.1.0</version>
-  <description>URDF/Xacro description of the AR4 palletizing robot: 6-axis arm on a 7th linear axis with MHF2 gripper.</description>
+  <description>URDF/Xacro description of the AR4 palletizing robot: 6-axis arm on a 7th linear axis with 3-Claw gripper.</description>
   <maintainer email="ahmed@example.com">Ahmed</maintainer>
   <license>MIT</license>
 

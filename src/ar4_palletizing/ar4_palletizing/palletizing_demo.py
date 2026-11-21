@@ -7,7 +7,7 @@ State machine (see state_machine.py):
 
 * Planning group ``"ar4_arm"`` contains joint_1..joint_6 AND joint_7
   (the prismatic track), so one MoveIt plan moves arm + track together.
-* The gripper (SMC MHF2-8D1, two fingers) is driven through the
+* The gripper (3-Claw servo gripper, SG90, three jaws) is driven through the
   ``gripper_controller/gripper_cmd`` GripperCommand action.
 * The conveyor MUST be stopped before picking (see conveyor_interface.py):
   this node only starts a pick after ``/conveyor/box_detected`` fired and
@@ -239,7 +239,7 @@ class PalletizingDemo(Node):
             return
         goal = GripperCommand.Goal()
         goal.command.position = float(position)
-        goal.command.max_effort = 5.0  # TBD: MHF2 gripping force
+        goal.command.max_effort = 5.0  # TBD: 3-Claw gripping force (SG90 stall ~1.8 kg·cm)
         future = self.gripper_client.send_goal_async(goal)
         future.add_done_callback(
             lambda f: self._on_gripper_done(f, done_event))

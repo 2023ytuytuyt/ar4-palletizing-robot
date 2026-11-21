@@ -10,9 +10,9 @@
 #   joint_state_broadcaster - publishes /joint_states (all joints)
 #   arm_controller          - JointTrajectoryController for joint_7 (track) +
 #                             joint_1..joint_6 (arm), position commands
-#   gripper_controller      - JointTrajectoryController for the two MHF2
-#                             finger joints (position commands in simulation;
-#                             the real MHF2 is pneumatic on/off — see docs/notes.md)
+#   gripper_controller      - JointTrajectoryController for the two placeholder
+#                             3-Claw finger joints (position commands; the real
+#                             3-Claw is servo-driven, SG90 — see docs/notes.md)
 
 controller_manager:
   ros__parameters:

@@ -3,7 +3,7 @@
 <package format="3">
   <name>ar4_control</name>
   <version>0.1.0</version>
-  <description>ros2_control configuration and launch for the AR4 palletizing robot (arm + 7th linear axis + MHF2 gripper).</description>
+  <description>ros2_control configuration and launch for the AR4 palletizing robot (arm + 7th linear axis + 3-Claw gripper).</description>
   <maintainer email="ahmed@example.com">Ahmed</maintainer>
   <license>MIT</license>
 

@@ -60,9 +60,8 @@ groups:
       - finger_right_joint
 ```
 
-The MHF2 is pneumatic (open/close), so in the real system the fingers are
-driven by an on/off command to the solenoid valve, not by a position
-trajectory. In MoveIt the gripper group is used for named poses only:
+The 3-Claw is servo-driven (SG90), so in the real system the jaws are driven
+by a servo position command, matching the position trajectory. In MoveIt the gripper group is used for named poses only:
 
 - `open` — fingers at `finger_gap` (open)
 - `close` — fingers at `finger_gap - finger_travel` (closed on the box)

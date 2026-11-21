@@ -69,8 +69,9 @@
         <state_interface name="velocity"/>
       </joint>
 
-      <!-- MHF2 gripper fingers (prismatic). In simulation they are position
-           joints; the real MHF2 is pneumatic (open/close) — see docs/notes.md. -->
+      <!-- 3-Claw gripper fingers (prismatic, PLACEHOLDER — the real gripper has
+           three jaws). In simulation they are position joints; the real 3-Claw
+           is servo-driven (SG90, position-controlled) — see docs/notes.md. -->
       <joint name="finger_left_joint">
         <command_interface name="position"/>
         <state_interface name="position"/>

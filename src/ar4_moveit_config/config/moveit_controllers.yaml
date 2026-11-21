@@ -5,9 +5,9 @@
 # later the same controller names are used with the real AR4HardwareInterface
 # (Teensy 4.1) without changing this file. See docs/notes.md.
 #
-# NOTE: the gripper is pneumatic (open/close) on the real MHF2, so the
-# finger joints are position-controlled here only for simulation. A
-# GripperActionController can replace gripper_controller later.
+# NOTE: the gripper is servo-driven (SG90, position-controlled) on the real
+# 3-Claw, so the finger joints are position-controlled here, matching the
+# real servo. A GripperActionController can replace gripper_controller later.
 moveit_simple_controller_manager:
   controller_names:
     - arm_controller

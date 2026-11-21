@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
   AR4 palletizing robot — URDF/Xacro
-  6 revolute joints (J1-J6) + 7th PRISMATIC axis (linear track) + MHF2 two-finger gripper.
+  6 revolute joints (J1-J6) + 7th PRISMATIC axis (linear track) + 3-Claw servo gripper.
 
   *** MEASURED CALIBRATION — 2026-11-21 ***
   All joint origins, link masses, centres of mass, inertias and mesh placements
@@ -26,8 +26,8 @@
   - J5 frame: J5 axis taken from the J5 Housing local-Y direction; J5 centre
     taken as the housing origin (no J5 shaft part in the assembly).
   - J6 frame: J6 axis from the gripper-mount local-Z; centre = gripper-mount origin.
-  - MHF2 gripper: no STL yet (export it from MHF2-8D1.SLDASM); body/fingers are
-    simple boxes with placeholder sizes, mass 0.10 kg (SMC catalogue value).
+  - 3-Claw gripper: no STL yet (export it from 3-Claw Gripper Assembly.SLDASM); body/jaws are
+    simple boxes with placeholder sizes, mass 0.10 kg (placeholder: SG90 is 9 g, printed parts TBD).
   - Inertias are box approximations from each link's aggregate bounding box.
   - Meshes come from the AR4-MK4 3D-print STLs; verify visually in RViz that
     every mesh sits on its link (a wrong local frame shows up immediately).
@@ -51,7 +51,7 @@
   <xacro:property name="link5_length" value="0.0215"/>   <!-- J5 axis -> J6 axis -->
   <xacro:property name="link6_length" value="0.05"/>     <!-- J6 axis -> gripper mount (placeholder) -->
 
-  <!-- Gripper (SMC MHF2-8D1) — sizes are placeholders until the MHF2 STL is exported -->
+  <!-- Gripper (3-Claw gripper (SG90 servo)) — sizes are placeholders until the 3-Claw STL is exported -->
   <xacro:property name="gripper_body_x" value="0.04"/>
   <xacro:property name="gripper_body_y" value="0.05"/>
   <xacro:property name="gripper_body_z" value="0.04"/>
@@ -61,7 +61,7 @@
   <xacro:property name="finger_travel" value="0.01"/>
 
   <!-- Masses (kg) — measured from SolidWorks mass properties, 2026-11-21.
-       Gripper 0.10 kg = SMC catalogue value for MHF2-8D1 (not yet measured). -->
+       Gripper 0.10 kg = placeholder (SG90 servo 9 g + printed parts, unmeasured). -->
   <xacro:property name="mass_base"  value="0.791"/>
   <xacro:property name="mass_link1" value="0.596"/>
   <xacro:property name="mass_link2" value="0.991"/>
@@ -370,8 +370,10 @@
     </collision>
   </link>
 
-  <!-- ==================== GRIPPER (SMC MHF2-8D1) ========================== -->
-  <!-- No MHF2 STL yet: body and fingers are placeholder boxes.
+  <!-- ==================== GRIPPER (3-Claw servo gripper, SG90) ========================== -->
+  <!-- No 3-Claw STL yet: body and jaws are placeholder boxes. The real gripper
+       has THREE jaws — the two finger joints below are placeholders, to be
+       replaced by three jaw joints when the STLs arrive.
        The gripper mount origin IS the J6 frame origin, so this joint is identity. -->
   <joint name="gripper_fixed" type="fixed">
     <parent link="link6"/>

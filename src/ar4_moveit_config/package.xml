@@ -3,7 +3,7 @@
 <package format="3">
   <name>ar4_moveit_config</name>
   <version>0.1.0</version>
-  <description>MoveIt 2 configuration for the AR4 palletizing robot: 6-axis arm on a 7th linear axis with MHF2 gripper.</description>
+  <description>MoveIt 2 configuration for the AR4 palletizing robot: 6-axis arm on a 7th linear axis with 3-Claw gripper.</description>
   <maintainer email="ahmed@example.com">Ahmed</maintainer>
   <license>MIT</license>
 

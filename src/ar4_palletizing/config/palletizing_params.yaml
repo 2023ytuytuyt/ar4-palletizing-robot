@@ -30,7 +30,7 @@ palletizing_demo:
     place_origin: [0.0, -0.30, 0.0, 0.0, 1.5708, 0.0]
     # Home joints [joint_7, joint_1..joint_6] — TBD safe pose.
     home_joint_values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    gripper_open_position: 0.01   # TBD, metres (MHF2 finger travel)
+    gripper_open_position: 0.01   # TBD, metres (3-Claw jaw travel)
     gripper_closed_position: 0.0  # TBD, metres
     velocity_scaling: 0.3
     dry_run: false        # false now that ar4_moveit_config exists; set true to simulate plans without moving the robot

@@ -7,7 +7,7 @@
 **No.** The whole project starts in simulation on a laptop (Ubuntu 24.04 +
 ROS 2 Jazzy): URDF in RViz, the arm in Gazebo, MoveIt planning, ros2_control
 with Mock Components. That is 70–80% of the project. The real hardware
-(Teensy 4.1, motors, MHF2 pneumatics) is swapped in later, and the layers
+(Teensy 4.1, motors, SG90 servo) is swapped in later, and the layers
 above ros2_control do not change. See [architecture.md](architecture.md) and
 [setup.md](setup.md).
 
