@@ -1,0 +1,378 @@
+<?xml version="1.0"?>
+<!--
+  AR4 palletizing robot — URDF/Xacro
+  6 revolute joints (J1–J6) + 7th PRISMATIC axis (linear track) + MHF2 two-finger gripper.
+
+  IMPORTANT: all dimensions below are named xacro:property values.
+  Values marked "MEASURE FROM SOLIDWORKS" are PLACEHOLDERS — they are NOT the
+  real design. Measure each one from the SolidWorks assembly ("01-last one.SLDASM")
+  and replace it before trusting any simulation result. See docs/notes.md.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="ar4_palletizing">
+
+  <!-- ======================= DIMENSIONS (edit these) ======================= -->
+  <!-- 7th axis -->
+  <!-- MEASURE FROM SOLIDWORKS: real track travel length. 0.8 is a PLACEHOLDER. -->
+  <xacro:property name="track_travel" value="0.8"/>
+  <!-- MEASURE FROM SOLIDWORKS: carriage (moving base) size -->
+  <xacro:property name="base_size_x" value="0.20"/>
+  <xacro:property name="base_size_y" value="0.20"/>
+  <xacro:property name="base_size_z" value="0.10"/>
+
+  <!-- Link lengths (distance between joint axes) -->
+  <!-- MEASURE FROM SOLIDWORKS: every value below is a placeholder -->
+  <xacro:property name="link1_height" value="0.10"/>   <!-- J1 axis -> J2 axis -->
+  <xacro:property name="link2_length" value="0.25"/>   <!-- J2 axis -> J3 axis -->
+  <xacro:property name="link3_length" value="0.22"/>   <!-- J3 axis -> J4 axis -->
+  <xacro:property name="link4_length" value="0.08"/>   <!-- J4 axis -> J5 axis -->
+  <xacro:property name="link5_length" value="0.07"/>   <!-- J5 axis -> J6 axis -->
+  <xacro:property name="link6_length" value="0.05"/>   <!-- J6 axis -> gripper mount -->
+
+  <!-- Link body sizes (visual/collision boxes and cylinders) -->
+  <!-- MEASURE FROM SOLIDWORKS -->
+  <xacro:property name="link1_radius" value="0.07"/>
+  <xacro:property name="link2_width"  value="0.06"/>
+  <xacro:property name="link3_width"  value="0.05"/>
+  <xacro:property name="wrist_radius" value="0.035"/>
+
+  <!-- Gripper (SMC MHF2-8D1) -->
+  <!-- MEASURE FROM SOLIDWORKS -->
+  <xacro:property name="gripper_body_x" value="0.04"/>
+  <xacro:property name="gripper_body_y" value="0.05"/>
+  <xacro:property name="gripper_body_z" value="0.04"/>
+  <xacro:property name="finger_length" value="0.03"/>
+  <xacro:property name="finger_width"  value="0.008"/>
+  <xacro:property name="finger_gap"    value="0.02"/>  <!-- half-distance between fingers when open -->
+  <xacro:property name="finger_travel" value="0.01"/>  <!-- closing travel per finger -->
+
+  <!-- Masses (kg) — MEASURE FROM SOLIDWORKS (mass properties tool) -->
+  <xacro:property name="mass_base"  value="2.0"/>
+  <xacro:property name="mass_link1" value="1.5"/>
+  <xacro:property name="mass_link2" value="1.0"/>
+  <xacro:property name="mass_link3" value="0.8"/>
+  <xacro:property name="mass_link4" value="0.4"/>
+  <xacro:property name="mass_link5" value="0.3"/>
+  <xacro:property name="mass_link6" value="0.2"/>
+  <xacro:property name="mass_gripper" value="0.2"/>
+  <xacro:property name="mass_finger"  value="0.05"/>
+
+  <!-- Joint limits (radians / metres) -->
+  <!-- MEASURE FROM SOLIDWORKS / AR4 datasheet: limits below are placeholders -->
+  <xacro:property name="j1_limit" value="3.14"/>
+  <xacro:property name="j2_limit" value="2.09"/>
+  <xacro:property name="j3_limit" value="2.09"/>
+  <xacro:property name="j4_limit" value="3.14"/>
+  <xacro:property name="j5_limit" value="2.09"/>
+  <xacro:property name="j6_limit" value="3.14"/>
+
+  <!-- ============================ MATERIALS ================================ -->
+  <material name="silver">
+    <color rgba="0.75 0.75 0.78 1.0"/>
+  </material>
+  <material name="black">
+    <color rgba="0.15 0.15 0.15 1.0"/>
+  </material>
+  <material name="dark_grey">
+    <color rgba="0.35 0.35 0.35 1.0"/>
+  </material>
+
+  <!-- ============================ WORLD ==================================== -->
+  <link name="world"/>
+
+  <!-- ==================== 7TH AXIS (PRISMATIC TRACK) ======================= -->
+  <!-- The whole arm slides along the X axis on the linear track (ball screw). -->
+  <joint name="joint_7" type="prismatic">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 ${base_size_z / 2}" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="0" upper="${track_travel}" effort="100" velocity="0.2"/>
+    <dynamics damping="0.1" friction="0.1"/>
+  </joint>
+
+  <link name="base_link">
+    <inertial>
+      <mass value="${mass_base}"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${base_size_x} ${base_size_y} ${base_size_z}"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${base_size_x} ${base_size_y} ${base_size_z}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ============================ JOINT 1 (J1) ============================= -->
+  <joint name="joint_1" type="revolute">
+    <parent link="base_link"/>
+    <child link="link1"/>
+    <origin xyz="0 0 ${base_size_z / 2}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-j1_limit}" upper="${j1_limit}" effort="50" velocity="1.0"/>
+    <dynamics damping="0.1" friction="0.1"/>
+  </joint>
+
+  <link name="link1">
+    <inertial>
+      <mass value="${mass_link1}"/>
+      <inertia ixx="0.005" ixy="0" ixz="0" iyy="0.005" iyz="0" izz="0.005"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 ${link1_height / 2}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${link1_radius}" length="${link1_height}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${link1_height / 2}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${link1_radius}" length="${link1_height}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ============================ JOINT 2 (J2) ============================= -->
+  <joint name="joint_2" type="revolute">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="0 0 ${link1_height}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="${-j2_limit}" upper="${j2_limit}" effort="50" velocity="1.0"/>
+    <dynamics damping="0.1" friction="0.1"/>
+  </joint>
+
+  <link name="link2">
+    <inertial>
+      <mass value="${mass_link2}"/>
+      <inertia ixx="0.005" ixy="0" ixz="0" iyy="0.005" iyz="0" izz="0.005"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 ${link2_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${link2_width} ${link2_width} ${link2_length}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${link2_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${link2_width} ${link2_width} ${link2_length}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ============================ JOINT 3 (J3) ============================= -->
+  <joint name="joint_3" type="revolute">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="0 0 ${link2_length}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="${-j3_limit}" upper="${j3_limit}" effort="50" velocity="1.0"/>
+    <dynamics damping="0.1" friction="0.1"/>
+  </joint>
+
+  <link name="link3">
+    <inertial>
+      <mass value="${mass_link3}"/>
+      <inertia ixx="0.004" ixy="0" ixz="0" iyy="0.004" iyz="0" izz="0.004"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 ${link3_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${link3_width} ${link3_width} ${link3_length}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${link3_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${link3_width} ${link3_width} ${link3_length}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ============================ JOINT 4 (J4) ============================= -->
+  <joint name="joint_4" type="revolute">
+    <parent link="link3"/>
+    <child link="link4"/>
+    <origin xyz="0 0 ${link3_length}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-j4_limit}" upper="${j4_limit}" effort="20" velocity="1.5"/>
+    <dynamics damping="0.05" friction="0.05"/>
+  </joint>
+
+  <link name="link4">
+    <inertial>
+      <mass value="${mass_link4}"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 ${link4_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${wrist_radius}" length="${link4_length}"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${link4_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${wrist_radius}" length="${link4_length}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ============================ JOINT 5 (J5) ============================= -->
+  <joint name="joint_5" type="revolute">
+    <parent link="link4"/>
+    <child link="link5"/>
+    <origin xyz="0 0 ${link4_length}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="${-j5_limit}" upper="${j5_limit}" effort="20" velocity="1.5"/>
+    <dynamics damping="0.05" friction="0.05"/>
+  </joint>
+
+  <link name="link5">
+    <inertial>
+      <mass value="${mass_link5}"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 ${link5_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${wrist_radius}" length="${link5_length}"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${link5_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${wrist_radius}" length="${link5_length}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ============================ JOINT 6 (J6) ============================= -->
+  <joint name="joint_6" type="revolute">
+    <parent link="link5"/>
+    <child link="link6"/>
+    <origin xyz="0 0 ${link5_length}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-j6_limit}" upper="${j6_limit}" effort="20" velocity="1.5"/>
+    <dynamics damping="0.05" friction="0.05"/>
+  </joint>
+
+  <link name="link6">
+    <inertial>
+      <mass value="${mass_link6}"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 ${link6_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${wrist_radius}" length="${link6_length}"/>
+      </geometry>
+      <material name="dark_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${link6_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${wrist_radius}" length="${link6_length}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ==================== GRIPPER (SMC MHF2-8D1) ========================== -->
+  <joint name="gripper_fixed" type="fixed">
+    <parent link="link6"/>
+    <child link="gripper_base"/>
+    <origin xyz="0 0 ${link6_length}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="gripper_base">
+    <inertial>
+      <mass value="${mass_gripper}"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 ${gripper_body_z / 2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${gripper_body_x} ${gripper_body_y} ${gripper_body_z}"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${gripper_body_z / 2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${gripper_body_x} ${gripper_body_y} ${gripper_body_z}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Left finger: slides along +Y to close -->
+  <joint name="finger_left_joint" type="prismatic">
+    <parent link="gripper_base"/>
+    <child link="finger_left"/>
+    <origin xyz="0 ${finger_gap} ${gripper_body_z}" rpy="0 0 0"/>
+    <axis xyz="0 -1 0"/>
+    <limit lower="0" upper="${finger_travel}" effort="10" velocity="0.1"/>
+  </joint>
+
+  <link name="finger_left">
+    <inertial>
+      <mass value="${mass_finger}"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 ${finger_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${finger_width} ${finger_width} ${finger_length}"/>
+      </geometry>
+      <material name="dark_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${finger_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${finger_width} ${finger_width} ${finger_length}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Right finger: slides along -Y to close -->
+  <joint name="finger_right_joint" type="prismatic">
+    <parent link="gripper_base"/>
+    <child link="finger_right"/>
+    <origin xyz="0 ${-finger_gap} ${gripper_body_z}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="0" upper="${finger_travel}" effort="10" velocity="0.1"/>
+  </joint>
+
+  <link name="finger_right">
+    <inertial>
+      <mass value="${mass_finger}"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 ${finger_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${finger_width} ${finger_width} ${finger_length}"/>
+      </geometry>
+      <material name="dark_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${finger_length / 2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${finger_width} ${finger_width} ${finger_length}"/>
+      </geometry>
+    </collision>
+  </link>
+
+</robot>
