@@ -1,0 +1,14 @@
+# 3D sensors for the MoveIt 2 planning scene (ROS 2 Jazzy)
+#
+# INTENTIONALLY EMPTY — no depth camera / point cloud is fed into MoveIt.
+#
+# The box-locating camera in this project is a fixed USB camera above the
+# pick point (eye-to-hand). It is used by a separate OpenCV node
+# (threshold -> contours / ArUco -> box centre/angle via cv_bridge) which
+# publishes the box pose as a TF / planning-scene collision object, not as
+# a MoveIt 3D sensor. See docs/notes.md section 5.
+#
+# If a depth camera is added later (e.g. for obstacle avoidance in the
+# planning scene), add a sensor entry here following the
+# moveit_ros_perception point-cloud/octomap format.
+sensors: []

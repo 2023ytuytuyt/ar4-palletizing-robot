@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>ar4_moveit_config</name>
+  <version>0.1.0</version>
+  <description>MoveIt 2 configuration for the AR4 palletizing robot: 6-axis arm on a 7th linear axis with MHF2 gripper.</description>
+  <maintainer email="ahmed@example.com">Ahmed</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>ar4_description</depend>
+  <depend>moveit_ros_move_group</depend>
+  <depend>moveit_ros_visualization</depend>
+  <depend>moveit_ros_planning_interface</depend>
+  <depend>moveit_ros_robot_interaction</depend>
+  <depend>moveit_ros_warehouse</depend>
+  <depend>rviz2</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

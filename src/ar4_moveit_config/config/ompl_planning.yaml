@@ -1,0 +1,41 @@
+# OMPL planning configuration (MoveIt 2, ROS 2 Jazzy)
+#
+# RRTConnect is the default planner: fast and reliable for 7-DOF pick-and-place
+# planning. Other planners are listed so they can be selected per-query from
+# RViz or the planning interface.
+planner_configs:
+  RRTConnectkConfigDefault:
+    type: geometric::RRTConnect
+    range: 0.0  # 0.0 = automatically computed from the state space
+  RRTkConfigDefault:
+    type: geometric::RRT
+    range: 0.0
+  RRTstarkConfigDefault:
+    type: geometric::RRTstar
+    range: 0.0
+    delay_collision_checking: 1
+  PRMkConfigDefault:
+    type: geometric::PRM
+    max_nearest_neighbors: 10
+  ESTkConfigDefault:
+    type: geometric::EST
+    range: 0.0
+    goal_bias: 0.05
+
+ar4_arm:
+  default_planner_config: RRTConnectkConfigDefault
+  planner_configs:
+    - RRTConnectkConfigDefault
+    - RRTkConfigDefault
+    - RRTstarkConfigDefault
+    - PRMkConfigDefault
+    - ESTkConfigDefault
+  projection_evaluator: joints(joint_1, joint_2)
+  longest_valid_segment_fraction: 0.005
+
+gripper:
+  default_planner_config: RRTConnectkConfigDefault
+  planner_configs:
+    - RRTConnectkConfigDefault
+  projection_evaluator: joints(finger_left_joint, finger_right_joint)
+  longest_valid_segment_fraction: 0.005

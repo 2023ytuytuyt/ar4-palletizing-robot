@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!--
+  AR4 palletizing robot — MoveIt 2 SRDF (Semantic Robot Description Format)
+
+  Robot model: ar4_palletizing (see ar4_description/urdf/ar4_palletizing.urdf.xacro)
+
+  PLANNING GROUPS
+  - "ar4_arm": joint_7 (prismatic track) + joint_1..joint_6 (revolute arm).
+    ONE planning group including the track, as recommended in docs/notes.md:
+    MoveIt then plans arm + track motion together, which is what palletizing
+    across a pallet row needs. The track is slow, so give it a low
+    velocity/acceleration scaling in the MoveIt config (see joint_limits.yaml).
+  - "gripper": the two MHF2 finger joints (finger_left_joint, finger_right_joint).
+
+  PLACEHOLDER WARNING: the "home" and "pick" group states below use
+  placeholder joint values. They are NOT measured or tested poses — check
+  them in RViz with the MoveIt plugin and replace them with real, reachable
+  poses before trusting any plan.
+-->
+<robot name="ar4_palletizing">
+
+  <!-- ===================== PLANNING GROUP: ARM + TRACK ===================== -->
+  <group name="ar4_arm">
+    <joint name="joint_7"/>
+    <joint name="joint_1"/>
+    <joint name="joint_2"/>
+    <joint name="joint_3"/>
+    <joint name="joint_4"/>
+    <joint name="joint_5"/>
+    <joint name="joint_6"/>
+    <chain base_link="world" tip_link="link6"/>
+  </group>
+
+  <!-- ===================== PLANNING GROUP: GRIPPER ========================= -->
+  <group name="gripper">
+    <joint name="finger_left_joint"/>
+    <joint name="finger_right_joint"/>
+    <chain base_link="gripper_base" tip_link="finger_right"/>
+  </group>
+
+  <!-- ===================== END EFFECTOR ==================================== -->
+  <end_effector name="mhf2_gripper" parent_link="link6" group="gripper"/>
+
+  <!-- ===================== DISABLED COLLISIONS ============================= -->
+  <!-- Adjacent links always touch by construction, so self-collision checks
+       between them are disabled (standard MoveIt practice). -->
+  <disable_collisions link1="world" link2="base_link" reason="Adjacent"/>
+  <disable_collisions link1="base_link" link2="link1" reason="Adjacent"/>
+  <disable_collisions link1="link1" link2="link2" reason="Adjacent"/>
+  <disable_collisions link1="link2" link2="link3" reason="Adjacent"/>
+  <disable_collisions link1="link3" link2="link4" reason="Adjacent"/>
+  <disable_collisions link1="link4" link2="link5" reason="Adjacent"/>
+  <disable_collisions link1="link5" link2="link6" reason="Adjacent"/>
+  <disable_collisions link1="link6" link2="gripper_base" reason="Adjacent"/>
+  <disable_collisions link1="gripper_base" link2="finger_left" reason="Adjacent"/>
+  <disable_collisions link1="gripper_base" link2="finger_right" reason="Adjacent"/>
+  <!-- The two fingers can touch each other when fully closed -->
+  <disable_collisions link1="finger_left" link2="finger_right" reason="Adjacent"/>
+
+  <!-- ===================== GROUP STATES (PLACEHOLDERS) ===================== -->
+  <!-- PLACEHOLDER joint values — verify in RViz and replace with real poses. -->
+  <group_state name="home" group="ar4_arm">
+    <joint name="joint_7" value="0"/>
+    <joint name="joint_1" value="0"/>
+    <joint name="joint_2" value="0"/>
+    <joint name="joint_3" value="0"/>
+    <joint name="joint_4" value="0"/>
+    <joint name="joint_5" value="0"/>
+    <joint name="joint_6" value="0"/>
+  </group_state>
+
+  <group_state name="pick" group="ar4_arm">
+    <joint name="joint_7" value="0.2"/>
+    <joint name="joint_1" value="0"/>
+    <joint name="joint_2" value="-0.6"/>
+    <joint name="joint_3" value="1.2"/>
+    <joint name="joint_4" value="0"/>
+    <joint name="joint_5" value="0.6"/>
+    <joint name="joint_6" value="0"/>
+  </group_state>
+
+  <group_state name="open" group="gripper">
+    <joint name="finger_left_joint" value="0"/>
+    <joint name="finger_right_joint" value="0"/>
+  </group_state>
+
+  <group_state name="closed" group="gripper">
+    <joint name="finger_left_joint" value="0.008"/>
+    <joint name="finger_right_joint" value="0.008"/>
+  </group_state>
+
+</robot>

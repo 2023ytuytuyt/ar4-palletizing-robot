@@ -1,0 +1,53 @@
+# Joint limits for MoveIt 2 planning (ROS 2 Jazzy)
+#
+# PLACEHOLDER VALUES — conservative limits chosen for a first simulation run.
+# They are NOT measured from the hardware. The URDF joint limits are the hard
+# limits; these values cap the speeds/accelerations MoveIt plans with.
+# In particular joint_7 (ball-screw track) is kept deliberately slow.
+# Replace with the real motor/drive limits before running real hardware.
+joint_limits:
+  joint_7:  # prismatic track (m, m/s, m/s^2)
+    has_velocity_limits: true
+    max_velocity: 0.2
+    has_acceleration_limits: true
+    max_acceleration: 0.2
+  joint_1:
+    has_velocity_limits: true
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+  joint_2:
+    has_velocity_limits: true
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+  joint_3:
+    has_velocity_limits: true
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+  joint_4:
+    has_velocity_limits: true
+    max_velocity: 1.5
+    has_acceleration_limits: true
+    max_acceleration: 1.5
+  joint_5:
+    has_velocity_limits: true
+    max_velocity: 1.5
+    has_acceleration_limits: true
+    max_acceleration: 1.5
+  joint_6:
+    has_velocity_limits: true
+    max_velocity: 1.5
+    has_acceleration_limits: true
+    max_acceleration: 1.5
+  finger_left_joint:
+    has_velocity_limits: true
+    max_velocity: 0.1
+    has_acceleration_limits: true
+    max_acceleration: 0.1
+  finger_right_joint:
+    has_velocity_limits: true
+    max_velocity: 0.1
+    has_acceleration_limits: true
+    max_acceleration: 0.1

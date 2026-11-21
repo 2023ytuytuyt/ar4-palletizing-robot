@@ -1,0 +1,37 @@
+# MoveIt 2 controller configuration (ROS 2 Jazzy)
+#
+# The controllers below are ros2_control FollowJointTrajectory controllers.
+# In simulation they are driven by ros2_control Mock Components (no hardware);
+# later the same controller names are used with the real AR4HardwareInterface
+# (Teensy 4.1) without changing this file. See docs/notes.md.
+#
+# NOTE: the gripper is pneumatic (open/close) on the real MHF2, so the
+# finger joints are position-controlled here only for simulation. A
+# GripperActionController can replace gripper_controller later.
+moveit_simple_controller_manager:
+  controller_names:
+    - arm_controller
+    - gripper_controller
+
+  arm_controller:
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: true
+    joints:
+      - joint_7
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
+
+  gripper_controller:
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: true
+    joints:
+      - finger_left_joint
+      - finger_right_joint
+
+moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
