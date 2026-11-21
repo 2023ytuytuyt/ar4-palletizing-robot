@@ -1,63 +1,78 @@
 <?xml version="1.0"?>
 <!--
   AR4 palletizing robot — URDF/Xacro
-  6 revolute joints (J1–J6) + 7th PRISMATIC axis (linear track) + MHF2 two-finger gripper.
+  6 revolute joints (J1-J6) + 7th PRISMATIC axis (linear track) + MHF2 two-finger gripper.
 
-  IMPORTANT: all dimensions below are named xacro:property values.
-  Values marked "MEASURE FROM SOLIDWORKS" are PLACEHOLDERS — they are NOT the
-  real design. Measure each one from the SolidWorks assembly ("01-last one.SLDASM")
-  and replace it before trusting any simulation result. See docs/notes.md.
+  *** MEASURED CALIBRATION — 2026-11-21 ***
+  All joint origins, link masses, centres of mass, inertias and mesh placements
+  below were computed from the SolidWorks assembly "01-last one.SLDASM" via the
+  MeasureAR4 macro (ar4_measurements v2, 93 parts, 2026-11-21 18:24 EET).
+  Method: each joint axis = its shaft/spindle part's long axis; each joint frame
+  origin = that shaft's part origin; frames converted from the SolidWorks
+  assembly frame (X = up) to ROS (Z = up) with (x,y,z)_ros = (z,-y,x)_asm.
+  The full derivation (script + per-part table) is in docs/urdf-measured-values.md.
+
+  JOINT ZERO = THE SOLIDWORKS POSE. The joint origins below reproduce the exact
+  pose the arm had in "01-last one.SLDASM" when all joint values are 0. That is
+  the calibrated zero of this URDF — NOT a canonical "arm straight up" pose.
+  (The zero offsets are baked into the origins because the joint angles in the
+  SolidWorks pose are unknown; the kinematics are exact up to that constant
+  offset per joint.) Joint limits are still placeholders — check them against
+  the AR4 datasheet / the physical end stops before running hardware.
+
+  STILL ESTIMATED (flagged in docs/urdf-measured-values.md):
+  - track travel 0.45 m (rail 500 mm, HGW15CC blocks 39 mm, end supports 452 mm
+    apart) — confirm from the two limit-switch positions.
+  - J5 frame: J5 axis taken from the J5 Housing local-Y direction; J5 centre
+    taken as the housing origin (no J5 shaft part in the assembly).
+  - J6 frame: J6 axis from the gripper-mount local-Z; centre = gripper-mount origin.
+  - MHF2 gripper: no STL yet (export it from MHF2-8D1.SLDASM); body/fingers are
+    simple boxes with placeholder sizes, mass 0.10 kg (SMC catalogue value).
+  - Inertias are box approximations from each link's aggregate bounding box.
+  - Meshes come from the AR4-MK4 3D-print STLs; verify visually in RViz that
+    every mesh sits on its link (a wrong local frame shows up immediately).
 -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="ar4_palletizing">
 
-  <!-- ======================= DIMENSIONS (edit these) ======================= -->
-  <!-- 7th axis -->
-  <!-- MEASURE FROM SOLIDWORKS: real track travel length. 0.8 is a PLACEHOLDER. -->
-  <xacro:property name="track_travel" value="0.8"/>
-  <!-- MEASURE FROM SOLIDWORKS: carriage (moving base) size -->
-  <xacro:property name="base_size_x" value="0.20"/>
-  <xacro:property name="base_size_y" value="0.20"/>
-  <xacro:property name="base_size_z" value="0.10"/>
+  <!-- ======================= DIMENSIONS (measured 2026-11-21) ============== -->
+  <!-- 7th axis: HGR15 rail 500 mm, SFU1204-500 ballscrew, end supports 452 mm apart.
+       Travel 0.45 m is an ESTIMATE — confirm from the limit switches. -->
+  <xacro:property name="track_travel" value="0.45"/>
+  <!-- Carriage plate ("Copy of 7th axis plate"): 152.4 x 346.1 x 9.5 mm -->
+  <xacro:property name="base_size_x" value="0.1524"/>
+  <xacro:property name="base_size_y" value="0.3461"/>
+  <xacro:property name="base_size_z" value="0.0095"/>
 
-  <!-- Link lengths (distance between joint axes) -->
-  <!-- MEASURE FROM SOLIDWORKS: every value below is a placeholder -->
-  <xacro:property name="link1_height" value="0.10"/>   <!-- J1 axis -> J2 axis -->
-  <xacro:property name="link2_length" value="0.25"/>   <!-- J2 axis -> J3 axis -->
-  <xacro:property name="link3_length" value="0.22"/>   <!-- J3 axis -> J4 axis -->
-  <xacro:property name="link4_length" value="0.08"/>   <!-- J4 axis -> J5 axis -->
-  <xacro:property name="link5_length" value="0.07"/>   <!-- J5 axis -> J6 axis -->
-  <xacro:property name="link6_length" value="0.05"/>   <!-- J6 axis -> gripper mount -->
+  <!-- Link lengths (perpendicular distance between joint axes, measured) -->
+  <xacro:property name="link1_height" value="0.0642"/>   <!-- J1 axis -> J2 axis -->
+  <xacro:property name="link2_length" value="0.3049"/>   <!-- J2 axis -> J3 axis -->
+  <xacro:property name="link3_length" value="0.0"/>      <!-- J3 axis -> J4 axis: axes intersect -->
+  <xacro:property name="link4_length" value="0.0200"/>   <!-- J4 axis -> J5 axis -->
+  <xacro:property name="link5_length" value="0.0215"/>   <!-- J5 axis -> J6 axis -->
+  <xacro:property name="link6_length" value="0.05"/>     <!-- J6 axis -> gripper mount (placeholder) -->
 
-  <!-- Link body sizes (visual/collision boxes and cylinders) -->
-  <!-- MEASURE FROM SOLIDWORKS -->
-  <xacro:property name="link1_radius" value="0.07"/>
-  <xacro:property name="link2_width"  value="0.06"/>
-  <xacro:property name="link3_width"  value="0.05"/>
-  <xacro:property name="wrist_radius" value="0.035"/>
-
-  <!-- Gripper (SMC MHF2-8D1) -->
-  <!-- MEASURE FROM SOLIDWORKS -->
+  <!-- Gripper (SMC MHF2-8D1) — sizes are placeholders until the MHF2 STL is exported -->
   <xacro:property name="gripper_body_x" value="0.04"/>
   <xacro:property name="gripper_body_y" value="0.05"/>
   <xacro:property name="gripper_body_z" value="0.04"/>
   <xacro:property name="finger_length" value="0.03"/>
   <xacro:property name="finger_width"  value="0.008"/>
-  <xacro:property name="finger_gap"    value="0.02"/>  <!-- half-distance between fingers when open -->
-  <xacro:property name="finger_travel" value="0.01"/>  <!-- closing travel per finger -->
+  <xacro:property name="finger_gap"    value="0.02"/>
+  <xacro:property name="finger_travel" value="0.01"/>
 
-  <!-- Masses (kg) — MEASURE FROM SOLIDWORKS (mass properties tool) -->
-  <xacro:property name="mass_base"  value="2.0"/>
-  <xacro:property name="mass_link1" value="1.5"/>
-  <xacro:property name="mass_link2" value="1.0"/>
-  <xacro:property name="mass_link3" value="0.8"/>
-  <xacro:property name="mass_link4" value="0.4"/>
-  <xacro:property name="mass_link5" value="0.3"/>
-  <xacro:property name="mass_link6" value="0.2"/>
-  <xacro:property name="mass_gripper" value="0.2"/>
+  <!-- Masses (kg) — measured from SolidWorks mass properties, 2026-11-21.
+       Gripper 0.10 kg = SMC catalogue value for MHF2-8D1 (not yet measured). -->
+  <xacro:property name="mass_base"  value="0.791"/>
+  <xacro:property name="mass_link1" value="0.596"/>
+  <xacro:property name="mass_link2" value="0.991"/>
+  <xacro:property name="mass_link3" value="0.118"/>
+  <xacro:property name="mass_link4" value="0.192"/>
+  <xacro:property name="mass_link5" value="0.320"/>
+  <xacro:property name="mass_link6" value="0.123"/>
+  <xacro:property name="mass_gripper" value="0.10"/>
   <xacro:property name="mass_finger"  value="0.05"/>
 
-  <!-- Joint limits (radians / metres) -->
-  <!-- MEASURE FROM SOLIDWORKS / AR4 datasheet: limits below are placeholders -->
+  <!-- Joint limits (radians / metres) — PLACEHOLDERS, see header note on joint zero -->
   <xacro:property name="j1_limit" value="3.14"/>
   <xacro:property name="j2_limit" value="2.09"/>
   <xacro:property name="j3_limit" value="2.09"/>
@@ -80,41 +95,39 @@
   <link name="world"/>
 
   <!-- ==================== 7TH AXIS (PRISMATIC TRACK) ======================= -->
-  <!-- The whole arm slides along the X axis on the linear track (ball screw). -->
+  <!-- Track runs along +Y in the world frame. Zero = the carriage position as
+       measured in SolidWorks; +0.45 m toward the free end of the rail. -->
+
   <joint name="joint_7" type="prismatic">
     <parent link="world"/>
     <child link="base_link"/>
-    <origin xyz="0 0 ${base_size_z / 2}" rpy="0 0 0"/>
-    <axis xyz="1 0 0"/>
+    <origin xyz="0.2599 0.0711 0.0750" rpy="-1.5708 -0.0000 0.0000"/>
+    <axis xyz="0 1 0"/>
     <limit lower="0" upper="${track_travel}" effort="100" velocity="0.2"/>
     <dynamics damping="0.1" friction="0.1"/>
   </joint>
 
   <link name="base_link">
     <inertial>
-      <mass value="${mass_base}"/>
-      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+      <origin xyz="-0.0622 -0.0060 0.0181" rpy="0 0 0"/>
+      <mass value="0.791"/>
+      <inertia ixx="0.00277" ixy="0" ixz="0" iyy="0.01288" iyz="0" izz="0.01032"/>
     </inertial>
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="${base_size_x} ${base_size_y} ${base_size_z}"/>
-      </geometry>
+      <origin xyz="0.0411 -0.0180 0.0369" rpy="3.0880 -0.0000 -1.5708"/>
+      <geometry><mesh filename="package://ar4_description/meshes/base_plate.stl" scale="0.001 0.001 0.001"/></geometry>
       <material name="silver"/>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="${base_size_x} ${base_size_y} ${base_size_z}"/>
-      </geometry>
+      <origin xyz="0.0411 -0.0180 0.0369" rpy="3.0880 -0.0000 -1.5708"/>
+      <geometry><mesh filename="package://ar4_description/meshes/base_plate.stl" scale="0.001 0.001 0.001"/></geometry>
     </collision>
   </link>
 
-  <!-- ============================ JOINT 1 (J1) ============================= -->
   <joint name="joint_1" type="revolute">
     <parent link="base_link"/>
     <child link="link1"/>
-    <origin xyz="0 0 ${base_size_z / 2}" rpy="0 0 0"/>
+    <origin xyz="0.0411 -0.0922 0.0369" rpy="1.5708 -0.0451 0.0000"/>
     <axis xyz="0 0 1"/>
     <limit lower="${-j1_limit}" upper="${j1_limit}" effort="50" velocity="1.0"/>
     <dynamics damping="0.1" friction="0.1"/>
@@ -122,185 +135,255 @@
 
   <link name="link1">
     <inertial>
-      <mass value="${mass_link1}"/>
-      <inertia ixx="0.005" ixy="0" ixz="0" iyy="0.005" iyz="0" izz="0.005"/>
+      <origin xyz="-0.0312 0.0031 -0.0277" rpy="0 0 0"/>
+      <mass value="0.596"/>
+      <inertia ixx="0.00148" ixy="0" ixz="0" iyy="0.00298" iyz="0" izz="0.00301"/>
     </inertial>
     <visual>
-      <origin xyz="0 0 ${link1_height / 2}" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="${link1_radius}" length="${link1_height}"/>
-      </geometry>
+      <origin xyz="0.0000 0.0000 -0.0055" rpy="0.0988 1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link1_turret_housing.stl" scale="0.001 0.001 0.001"/></geometry>
       <material name="black"/>
     </visual>
     <collision>
-      <origin xyz="0 0 ${link1_height / 2}" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="${link1_radius}" length="${link1_height}"/>
-      </geometry>
+      <origin xyz="0.0000 0.0000 -0.0055" rpy="0.0988 1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link1_turret_housing.stl" scale="0.001 0.001 0.001"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0000 0.0000 -0.0050" rpy="1.5257 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link1_turret_platform.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0000 0.0000 -0.0050" rpy="1.5257 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link1_turret_platform.stl" scale="0.001 0.001 0.001"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="1.1307 1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link1_spindle.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="1.1307 1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link1_spindle.stl" scale="0.001 0.001 0.001"/></geometry>
     </collision>
   </link>
 
-  <!-- ============================ JOINT 2 (J2) ============================= -->
   <joint name="joint_2" type="revolute">
     <parent link="link1"/>
     <child link="link2"/>
-    <origin xyz="0 0 ${link1_height}" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
+    <origin xyz="0.0643 0.0000 0.0776" rpy="-1.5708 -0.2672 -0.0451"/>
+    <axis xyz="0 0 1"/>
     <limit lower="${-j2_limit}" upper="${j2_limit}" effort="50" velocity="1.0"/>
     <dynamics damping="0.1" friction="0.1"/>
   </joint>
 
   <link name="link2">
     <inertial>
-      <mass value="${mass_link2}"/>
-      <inertia ixx="0.005" ixy="0" ixz="0" iyy="0.005" iyz="0" izz="0.005"/>
+      <origin xyz="0.0439 0.0087 -0.0030" rpy="0 0 0"/>
+      <mass value="0.991"/>
+      <inertia ixx="0.00379" ixy="0" ixz="0" iyy="0.01622" iyz="0" izz="0.01653"/>
     </inertial>
     <visual>
-      <origin xyz="0 0 ${link2_length / 2}" rpy="0 0 0"/>
-      <geometry>
-        <box size="${link2_width} ${link2_width} ${link2_length}"/>
-      </geometry>
+      <origin xyz="0.0000 0.0000 0.0429" rpy="1.5708 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link2_arm.stl" scale="0.001 0.001 0.001"/></geometry>
       <material name="black"/>
     </visual>
     <collision>
-      <origin xyz="0 0 ${link2_length / 2}" rpy="0 0 0"/>
-      <geometry>
-        <box size="${link2_width} ${link2_width} ${link2_length}"/>
-      </geometry>
+      <origin xyz="0.0000 0.0000 0.0429" rpy="1.5708 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link2_arm.stl" scale="0.001 0.001 0.001"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="1.5708 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link2_spindle.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="1.5708 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link2_spindle.stl" scale="0.001 0.001 0.001"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.0724 -0.1525 0.0000" rpy="1.8380 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link2_turret_housing.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.0724 -0.1525 0.0000" rpy="1.8380 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link2_turret_housing.stl" scale="0.001 0.001 0.001"/></geometry>
     </collision>
   </link>
 
-  <!-- ============================ JOINT 3 (J3) ============================= -->
   <joint name="joint_3" type="revolute">
     <parent link="link2"/>
     <child link="link3"/>
-    <origin xyz="0 0 ${link2_length}" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
+    <origin xyz="0.3049 0.0000 0.0279" rpy="3.1416 -0.0000 0.2672"/>
+    <axis xyz="0 0 1"/>
     <limit lower="${-j3_limit}" upper="${j3_limit}" effort="50" velocity="1.0"/>
     <dynamics damping="0.1" friction="0.1"/>
   </joint>
 
   <link name="link3">
     <inertial>
-      <mass value="${mass_link3}"/>
-      <inertia ixx="0.004" ixy="0" ixz="0" iyy="0.004" iyz="0" izz="0.004"/>
+      <origin xyz="0.1255 0.0009 0.0226" rpy="0 0 0"/>
+      <mass value="0.118"/>
+      <inertia ixx="0.00012" ixy="0" ixz="0" iyy="0.00065" iyz="0" izz="0.00065"/>
     </inertial>
     <visual>
-      <origin xyz="0 0 ${link3_length / 2}" rpy="0 0 0"/>
-      <geometry>
-        <box size="${link3_width} ${link3_width} ${link3_length}"/>
-      </geometry>
-      <material name="black"/>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="-3.1416 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link3_spindle.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="silver"/>
     </visual>
     <collision>
-      <origin xyz="0 0 ${link3_length / 2}" rpy="0 0 0"/>
-      <geometry>
-        <box size="${link3_width} ${link3_width} ${link3_length}"/>
-      </geometry>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="-3.1416 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link3_spindle.stl" scale="0.001 0.001 0.001"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="1.1799 1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link3_bearing_cup.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="1.1799 1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link3_bearing_cup.stl" scale="0.001 0.001 0.001"/></geometry>
     </collision>
   </link>
 
-  <!-- ============================ JOINT 4 (J4) ============================= -->
   <joint name="joint_4" type="revolute">
     <parent link="link3"/>
     <child link="link4"/>
-    <origin xyz="0 0 ${link3_length}" rpy="0 0 0"/>
+    <origin xyz="0.0757 0.0000 0.0367" rpy="1.5708 1.1897 -1.5708"/>
     <axis xyz="0 0 1"/>
     <limit lower="${-j4_limit}" upper="${j4_limit}" effort="20" velocity="1.5"/>
-    <dynamics damping="0.05" friction="0.05"/>
+    <dynamics damping="0.1" friction="0.1"/>
   </joint>
 
   <link name="link4">
     <inertial>
-      <mass value="${mass_link4}"/>
-      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      <origin xyz="0.0046 0.0027 0.0829" rpy="0 0 0"/>
+      <mass value="0.192"/>
+      <inertia ixx="0.00105" ixy="0" ixz="0" iyy="0.00102" iyz="0" izz="0.00028"/>
     </inertial>
     <visual>
-      <origin xyz="0 0 ${link4_length / 2}" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="${wrist_radius}" length="${link4_length}"/>
-      </geometry>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="-2.2442 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link4_main_shaft.stl" scale="0.001 0.001 0.001"/></geometry>
       <material name="silver"/>
     </visual>
     <collision>
-      <origin xyz="0 0 ${link4_length / 2}" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="${wrist_radius}" length="${link4_length}"/>
-      </geometry>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="-2.2442 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link4_main_shaft.stl" scale="0.001 0.001 0.001"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0248 -0.0099 0.0757" rpy="3.1416 -0.0000 2.7605"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link4_turret_housing.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0248 -0.0099 0.0757" rpy="3.1416 -0.0000 2.7605"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link4_turret_housing.stl" scale="0.001 0.001 0.001"/></geometry>
     </collision>
   </link>
 
-  <!-- ============================ JOINT 5 (J5) ============================= -->
   <joint name="joint_5" type="revolute">
     <parent link="link4"/>
     <child link="link5"/>
-    <origin xyz="0 0 ${link4_length}" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
+    <origin xyz="0.0320 0.0000 0.0250" rpy="-1.5708 1.4592 -2.2442"/>
+    <axis xyz="0 0 1"/>
     <limit lower="${-j5_limit}" upper="${j5_limit}" effort="20" velocity="1.5"/>
-    <dynamics damping="0.05" friction="0.05"/>
+    <dynamics damping="0.1" friction="0.1"/>
   </joint>
 
   <link name="link5">
     <inertial>
-      <mass value="${mass_link5}"/>
-      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      <origin xyz="0.0329 -0.0208 -0.0272" rpy="0 0 0"/>
+      <mass value="0.320"/>
+      <inertia ixx="0.00118" ixy="0" ixz="0" iyy="0.00340" iyz="0" izz="0.00295"/>
     </inertial>
     <visual>
-      <origin xyz="0 0 ${link5_length / 2}" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="${wrist_radius}" length="${link5_length}"/>
-      </geometry>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="-1.5708 -0.0000 -1.4592"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link5_housing.stl" scale="0.001 0.001 0.001"/></geometry>
       <material name="silver"/>
     </visual>
     <collision>
-      <origin xyz="0 0 ${link5_length / 2}" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="${wrist_radius}" length="${link5_length}"/>
-      </geometry>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="-1.5708 -0.0000 -1.4592"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link5_housing.stl" scale="0.001 0.001 0.001"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0583 -0.0235 -0.0259" rpy="-1.4880 -0.0000 0.1116"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link5_belt_carrier.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0583 -0.0235 -0.0259" rpy="-1.4880 -0.0000 0.1116"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link5_belt_carrier.stl" scale="0.001 0.001 0.001"/></geometry>
     </collision>
   </link>
 
-  <!-- ============================ JOINT 6 (J6) ============================= -->
   <joint name="joint_6" type="revolute">
     <parent link="link5"/>
     <child link="link6"/>
-    <origin xyz="0 0 ${link5_length}" rpy="0 0 0"/>
+    <origin xyz="0.1934 -0.0000 -0.0251" rpy="1.5708 -0.0000 1.6824"/>
     <axis xyz="0 0 1"/>
     <limit lower="${-j6_limit}" upper="${j6_limit}" effort="20" velocity="1.5"/>
-    <dynamics damping="0.05" friction="0.05"/>
+    <dynamics damping="0.1" friction="0.1"/>
   </joint>
 
   <link name="link6">
     <inertial>
-      <mass value="${mass_link6}"/>
-      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+      <origin xyz="0.0210 -0.0001 -0.0514" rpy="0 0 0"/>
+      <mass value="0.123"/>
+      <inertia ixx="0.00030" ixy="0" ixz="0" iyy="0.00035" iyz="0" izz="0.00012"/>
     </inertial>
     <visual>
-      <origin xyz="0 0 ${link6_length / 2}" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="${wrist_radius}" length="${link6_length}"/>
-      </geometry>
+      <origin xyz="-0.0178 -0.0276 -0.0579" rpy="-3.1416 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link6_housing.stl" scale="0.001 0.001 0.001"/></geometry>
       <material name="dark_grey"/>
     </visual>
     <collision>
-      <origin xyz="0 0 ${link6_length / 2}" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="${wrist_radius}" length="${link6_length}"/>
-      </geometry>
+      <origin xyz="-0.0178 -0.0276 -0.0579" rpy="-3.1416 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link6_housing.stl" scale="0.001 0.001 0.001"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="0.3173 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link6_gripper_mount.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="dark_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0000 0.0000 0.0000" rpy="0.3173 -1.5708 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link6_gripper_mount.stl" scale="0.001 0.001 0.001"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0355 0.0250 -0.1442" rpy="0.0000 -0.0000 3.1416"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link6_bearing_arm.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="dark_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0355 0.0250 -0.1442" rpy="0.0000 -0.0000 3.1416"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link6_bearing_arm.stl" scale="0.001 0.001 0.001"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0357 0.0000 -0.0202" rpy="2.8162 -0.0000 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link6_bearing_cap.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="dark_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0357 0.0000 -0.0202" rpy="2.8162 -0.0000 0.0000"/>
+      <geometry><mesh filename="package://ar4_description/meshes/link6_bearing_cap.stl" scale="0.001 0.001 0.001"/></geometry>
     </collision>
   </link>
 
   <!-- ==================== GRIPPER (SMC MHF2-8D1) ========================== -->
+  <!-- No MHF2 STL yet: body and fingers are placeholder boxes.
+       The gripper mount origin IS the J6 frame origin, so this joint is identity. -->
   <joint name="gripper_fixed" type="fixed">
     <parent link="link6"/>
     <child link="gripper_base"/>
-    <origin xyz="0 0 ${link6_length}" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 
   <link name="gripper_base">
     <inertial>
+      <origin xyz="0 0 0.02" rpy="0 0 0"/>
       <mass value="${mass_gripper}"/>
-      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+      <inertia ixx="0.00005" ixy="0" ixz="0" iyy="0.00005" iyz="0" izz="0.00005"/>
     </inertial>
     <visual>
       <origin xyz="0 0 ${gripper_body_z / 2}" rpy="0 0 0"/>

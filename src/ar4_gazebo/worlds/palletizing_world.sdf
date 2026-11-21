@@ -2,15 +2,18 @@
 <!--
   palletizing_world.sdf — Gazebo Harmonic world for the AR4 palletizing cell.
 
-  Layout (all sizes in metres, X = track direction):
+  Layout (all sizes in metres; matches the measured URDF, 2026-11-21):
     - ground plane
-    - linear track rail along X (robot slides on it, joint_7)
-    - conveyor belt on the -Y side, 3 very small boxes on it (pick point)
-    - wooden pallet on the +Y side (place point, fixed pose)
+    - linear track rail along Y (robot slides on it, joint_7, 0..0.45 m).
+      Rail is the measured HGR15 (500 mm) on 8020 framing; the rail model is
+      0.55 m long (framing length 551.56 mm). Track travel 0.45 m is an
+      ESTIMATE — confirm from the limit switches.
+    - conveyor belt on the +X side, 3 very small boxes on it (pick point).
+      The arm reaches toward +X in its measured zero pose.
+    - wooden pallet on the -X side (place point, fixed pose)
     - fixed camera on a pole above the pick point (eye-to-hand vision)
 
   PLACEHOLDERS — do NOT treat as the real design:
-    - track rail length: 1.2 m (must match the real track travel, TBD — MEASURE)
     - box size 0.05 m and box mass 0.1 kg: TBD — measure the real boxes
     - pallet size/pattern: TBD — boxes per row and number of layers not decided
     - conveyor length/height and camera height: TBD
@@ -52,42 +55,44 @@
       </link>
     </model>
 
-    <!-- Linear track rail along X. Robot base slides on it (joint_7, 0..0.8 m placeholder).
-         Rail length 1.2 m is a PLACEHOLDER — MEASURE the real track. -->
+    <!-- Linear track rail along Y. Robot base slides on it (joint_7, 0..0.45 m).
+         Rail centre (0.327, 0.242) is the measured HGR15 position; the 0.55 m
+         length is the measured 8020 framing (551.56 mm). -->
     <model name="track_rail">
       <static>true</static>
-      <pose>0.4 0 0.05 0 0 0</pose>
+      <pose>0.327 0.242 0.0265 0 0 0</pose>
       <link name="rail">
         <collision name="collision">
-          <geometry><box><size>1.2 0.12 0.10</size></box></geometry>
+          <geometry><box><size>0.15 0.55 0.053</size></box></geometry>
         </collision>
         <visual name="visual">
-          <geometry><box><size>1.2 0.12 0.10</size></box></geometry>
+          <geometry><box><size>0.15 0.55 0.053</size></box></geometry>
           <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
         </visual>
       </link>
     </model>
 
-    <!-- Conveyor belt on the -Y side. Belt top at z = 0.35 m (PLACEHOLDER height).
-         Pick point is above the belt at about (0.2, -0.6, 0.4). -->
+    <!-- Conveyor belt on the +X side (the arm reaches toward +X).
+         Belt top at z = 0.35 m (PLACEHOLDER height).
+         Pick point is above the belt at about (0.75, 0.24, 0.4). -->
     <model name="conveyor">
       <static>true</static>
-      <pose>0.2 -0.6 0.175 0 0 0</pose>
+      <pose>0.75 0.24 0.175 0 0 0</pose>
       <link name="belt">
         <collision name="collision">
-          <geometry><box><size>0.8 0.3 0.35</size></box></geometry>
+          <geometry><box><size>0.3 0.8 0.35</size></box></geometry>
         </collision>
         <visual name="visual">
-          <geometry><box><size>0.8 0.3 0.35</size></box></geometry>
+          <geometry><box><size>0.3 0.8 0.35</size></box></geometry>
           <material><ambient>0.15 0.15 0.15 1</ambient><diffuse>0.15 0.15 0.15 1</diffuse></material>
         </visual>
       </link>
     </model>
 
-    <!-- 3 very small boxes on the conveyor.
+    <!-- 3 very small boxes on the conveyor, spaced along the track (Y).
          Box size 0.05 m and mass 0.1 kg are PLACEHOLDERS — MEASURE the real boxes. -->
     <model name="box_1">
-      <pose>0.0 -0.6 0.375 0 0 0</pose>
+      <pose>0.75 0.04 0.375 0 0 0</pose>
       <link name="link">
         <inertial><mass>0.1</mass><inertia><ixx>0.0001</ixx><iyy>0.0001</iyy><izz>0.0001</izz></inertia></inertial>
         <collision name="collision"><geometry><box><size>0.05 0.05 0.05</size></box></geometry></collision>
@@ -95,7 +100,7 @@
       </link>
     </model>
     <model name="box_2">
-      <pose>0.2 -0.6 0.375 0 0 0</pose>
+      <pose>0.75 0.24 0.375 0 0 0</pose>
       <link name="link">
         <inertial><mass>0.1</mass><inertia><ixx>0.0001</ixx><iyy>0.0001</iyy><izz>0.0001</izz></inertia></inertial>
         <collision name="collision"><geometry><box><size>0.05 0.05 0.05</size></box></geometry></collision>
@@ -103,7 +108,7 @@
       </link>
     </model>
     <model name="box_3">
-      <pose>0.4 -0.6 0.375 0 0 0</pose>
+      <pose>0.75 0.44 0.375 0 0 0</pose>
       <link name="link">
         <inertial><mass>0.1</mass><inertia><ixx>0.0001</ixx><iyy>0.0001</iyy><izz>0.0001</izz></inertia></inertial>
         <collision name="collision"><geometry><box><size>0.05 0.05 0.05</size></box></geometry></collision>
@@ -111,25 +116,25 @@
       </link>
     </model>
 
-    <!-- Wooden pallet on the +Y side (fixed pose). Pallet size 0.5 x 0.4 m is a
+    <!-- Wooden pallet on the -X side (fixed pose). Pallet size 0.4 x 0.4 m is a
          PLACEHOLDER; pallet pattern (boxes per row, layers) is TBD. -->
     <model name="pallet">
       <static>true</static>
-      <pose>0.6 0.6 0.06 0 0 0</pose>
+      <pose>-0.25 0.24 0.06 0 0 0</pose>
       <link name="base">
-        <collision name="collision"><geometry><box><size>0.5 0.4 0.12</size></box></geometry></collision>
-        <visual name="visual"><geometry><box><size>0.5 0.4 0.12</size></box></geometry><material><ambient>0.6 0.45 0.25 1</ambient><diffuse>0.6 0.45 0.25 1</diffuse></material></visual>
+        <collision name="collision"><geometry><box><size>0.4 0.4 0.12</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.4 0.4 0.12</size></box></geometry><material><ambient>0.6 0.45 0.25 1</ambient><diffuse>0.6 0.45 0.25 1</diffuse></material></visual>
       </link>
       <!-- slats on top of the pallet -->
       <link name="slat_1">
         <pose>0 -0.12 0.07 0 0 0</pose>
-        <collision name="collision"><geometry><box><size>0.5 0.08 0.02</size></box></geometry></collision>
-        <visual name="visual"><geometry><box><size>0.5 0.08 0.02</size></box></geometry><material><ambient>0.7 0.55 0.3 1</ambient><diffuse>0.7 0.55 0.3 1</diffuse></material></visual>
+        <collision name="collision"><geometry><box><size>0.4 0.08 0.02</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.4 0.08 0.02</size></box></geometry><material><ambient>0.7 0.55 0.3 1</ambient><diffuse>0.7 0.55 0.3 1</diffuse></material></visual>
       </link>
       <link name="slat_2">
         <pose>0 0.12 0.07 0 0 0</pose>
-        <collision name="collision"><geometry><box><size>0.5 0.08 0.02</size></box></geometry></collision>
-        <visual name="visual"><geometry><box><size>0.5 0.08 0.02</size></box></geometry><material><ambient>0.7 0.55 0.3 1</ambient><diffuse>0.7 0.55 0.3 1</diffuse></material></visual>
+        <collision name="collision"><geometry><box><size>0.4 0.08 0.02</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.4 0.08 0.02</size></box></geometry><material><ambient>0.7 0.55 0.3 1</ambient><diffuse>0.7 0.55 0.3 1</diffuse></material></visual>
       </link>
       <joint name="slat_1_joint" type="fixed"><parent>base</parent><child>slat_1</child></joint>
       <joint name="slat_2_joint" type="fixed"><parent>base</parent><child>slat_2</child></joint>
@@ -141,7 +146,7 @@
          ROS image topic is bridged in config/gz_bridge.yaml. -->
     <model name="pick_camera">
       <static>true</static>
-      <pose>0.2 -0.6 0 0 0 0</pose>
+      <pose>0.75 0.24 0 0 0 0</pose>
       <link name="camera_assembly">
         <visual name="pole">
           <pose>0 0 0.6 0 0 0</pose>
