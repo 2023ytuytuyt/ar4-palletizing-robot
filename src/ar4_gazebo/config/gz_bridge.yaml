@@ -1,0 +1,33 @@
+# ros_gz_bridge config for the palletizing cell (ROS 2 Jazzy / Gazebo Harmonic).
+#
+# Active:
+#   /clock — Gazebo sim time into ROS (required for everything time-based)
+#
+# NOTE on /joint_states: do NOT bridge it from Gazebo. In this setup
+# /joint_states is published in ROS by joint_state_broadcaster (ros2_control,
+# started by ar4_control). Bridging the Gazebo joint-state topic as well would
+# publish the same topic twice. The Gazebo-side joint state topic is
+# /world/palletizing_world/model/ar4_palletizing/joint_state — the entry below
+# is kept commented out for reference only.
+#
+# NOTE on the camera: the pick_camera sensor in worlds/palletizing_world.sdf
+# publishes /camera/image_raw in Gazebo. Uncomment the camera entries below
+# once the vision node is ready (see docs/notes.md: OpenCV via cv_bridge).
+
+- ros_topic_name: "/clock"
+  gz_topic_name: "/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "gz.msgs.Clock"
+  direction: GZ_TO_ROS
+
+# - ros_topic_name: "/joint_states"
+#   gz_topic_name: "/world/palletizing_world/model/ar4_palletizing/joint_state"
+#   ros_type_name: "sensor_msgs/msg/JointState"
+#   gz_type_name: "gz.msgs.Model"
+#   direction: GZ_TO_ROS
+
+# - ros_topic_name: "/camera/image_raw"
+#   gz_topic_name: "/camera/image_raw"
+#   ros_type_name: "sensor_msgs/msg/Image"
+#   gz_type_name: "gz.msgs.Image"
+#   direction: GZ_TO_ROS

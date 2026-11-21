@@ -374,5 +374,9 @@
       </geometry>
     </collision>
   </link>
+  <!-- ros2_control hardware (Mock Components for simulation).
+       Defined in ar4_control; see config/ar4.ros2_control.xacro. -->
+  <xacro:include filename="$(find ar4_description)/config/ar4.ros2_control.xacro" />
+  <xacro:ar4_ros2_control />
 
 </robot>

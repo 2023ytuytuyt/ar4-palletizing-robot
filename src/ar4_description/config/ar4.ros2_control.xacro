@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!--
+  ar4.ros2_control.xacro — ros2_control hardware description for the AR4
+  palletizing robot (ROS 2 Jazzy).
+
+  Hardware: mock_components/GenericSystem for SIMULATION. It pretends to be
+  the real hardware: it accepts position commands and reports position +
+  velocity states for every joint. No Teensy / no motors needed to run the
+  controllers in RViz or Gazebo.
+
+  LATER (real hardware): replace the <hardware> block below with the real
+  AR4HardwareInterface plugin (Teensy 4.1), keeping the same joint list and
+  interfaces — config/ros2_controllers.yaml does NOT need to change.
+
+  HOW TO USE — the main URDF includes this file at the end of
+  src/ar4_description/urdf/ar4_palletizing.urdf.xacro:
+
+      <xacro:include filename="$(find ar4_description)/config/ar4.ros2_control.xacro" />
+      <xacro:ar4_ros2_control />
+
+  It lives in ar4_description (not ar4_control) so there is no circular
+  package dependency. Until it is included, controller_manager will report
+  "no hardware" and the spawners will fail.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="ar4_palletizing">
+
+  <xacro:macro name="ar4_ros2_control">
+    <ros2_control name="AR4System" type="system">
+      <hardware>
+        <plugin>mock_components/GenericSystem</plugin>
+      </hardware>
+
+      <!-- 7th axis: linear track (prismatic). Slow axis, position controlled. -->
+      <joint name="joint_7">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+
+      <!-- Arm joints J1..J6 (revolute) -->
+      <joint name="joint_1">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="joint_2">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="joint_3">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="joint_4">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="joint_5">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="joint_6">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+
+      <!-- MHF2 gripper fingers (prismatic). In simulation they are position
+           joints; the real MHF2 is pneumatic (open/close) — see docs/notes.md. -->
+      <joint name="finger_left_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="finger_right_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+    </ros2_control>
+  </xacro:macro>
+
+</robot>

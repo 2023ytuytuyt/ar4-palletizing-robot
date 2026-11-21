@@ -1,0 +1,64 @@
+# ros2_control controllers for the AR4 palletizing robot (ROS 2 Jazzy).
+#
+# HARDWARE: this config is for SIMULATION. The robot description uses
+# mock_components/GenericSystem (see config/ar4.ros2_control.xacro), so no real
+# hardware is needed to run the controllers in RViz/Gazebo.
+# Later, swap the mock hardware for the real AR4HardwareInterface (Teensy 4.1)
+# in ar4.ros2_control.xacro — this controller config does NOT need to change.
+#
+# Controllers:
+#   joint_state_broadcaster - publishes /joint_states (all joints)
+#   arm_controller          - JointTrajectoryController for joint_7 (track) +
+#                             joint_1..joint_6 (arm), position commands
+#   gripper_controller      - JointTrajectoryController for the two MHF2
+#                             finger joints (position commands in simulation;
+#                             the real MHF2 is pneumatic on/off — see docs/notes.md)
+
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz — matches the 60 Hz real target with margin; tune later
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    gripper_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+arm_controller:
+  ros__parameters:
+    # joint_7 FIRST: the track moves the whole arm, so it is part of the
+    # same trajectory as the arm joints (one planning group in MoveIt 2).
+    joints:
+      - joint_7
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    # Track is slow: keep its gains/scaling conservative (tune after first runs)
+    state_publish_rate: 50.0
+    action_monitor_rate: 20.0
+    allow_partial_joints_goal: false
+
+gripper_controller:
+  ros__parameters:
+    joints:
+      - finger_left_joint
+      - finger_right_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    state_publish_rate: 50.0
+    action_monitor_rate: 20.0
+    allow_partial_joints_goal: false
