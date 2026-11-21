@@ -79,3 +79,27 @@ later). In simulation they can stay as position joints for now.
   classical OpenCV (threshold → contours → box centre/angle) via `cv_bridge`,
   or ArUco markers; transform camera → base with TF.
 - Pallet position is fixed; the pallet pattern (boxes per row, layers) is still TBD.
+
+## 6. Where the new packages live
+
+The full documentation for the repo now lives in `docs/`:
+
+- [architecture.md](architecture.md) — system overview, ASCII diagram, package
+  map (including the packages `ar4_moveit_config`, `ar4_control`,
+  `ar4_gazebo`, `ar4_palletizing` (incl. the vision node), and the data flow of one
+  pick-and-place cycle.
+- [setup.md](setup.md) — full setup guide (Ubuntu 24.04, ROS 2 Jazzy,
+  clone/build/run in order) and troubleshooting.
+- [urdf-guide.md](urdf-guide.md) — URDF structure, the full xacro property
+  list (all placeholders), SolidWorks mesh export, and how to fill in real
+  link lengths/masses.
+- [moveit-guide.md](moveit-guide.md) — planning group `ar4_arm` (joints 1–7),
+  gripper group, adding poses, velocity scaling for the slow track.
+- [vision-guide.md](vision-guide.md) — classical OpenCV pipeline (threshold,
+  contours, `minAreaRect`), calibration, ArUco option, why no deep learning.
+- [hardware-checklist.md](hardware-checklist.md) — the full hardware TODO as
+  a checklist, with what each open item blocks.
+- [faq.md](faq.md) — short Q&A.
+
+This file (`notes.md`) keeps the original short notes above; the guides above
+are the detailed versions of the same topics.

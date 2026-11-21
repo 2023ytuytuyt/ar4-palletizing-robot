@@ -29,16 +29,22 @@ A ROS 2 (Jazzy) simulation of a palletizing robot arm for the graduation project
 ar4-palletizing-robot/
 ├── README.md
 ├── .gitignore
-├── docs/
+├── docs/                      # Full documentation (see docs/faq.md for the index)
+│   ├── architecture.md        # System overview + package map
+│   ├── setup.md               # Install + build + run guide
+│   ├── urdf-guide.md          # URDF structure + SolidWorks mesh export
+│   ├── moveit-guide.md        # Planning groups, joint_7 in MoveIt
+│   ├── vision-guide.md        # Classical OpenCV box detection
+│   ├── hardware-checklist.md  # Hardware TODO (all open)
+│   ├── faq.md
 │   └── notes.md               # SolidWorks mesh export, MoveIt + ros2_control notes
 └── src/
     ├── ar4_description/       # URDF/Xacro + RViz launch
-    │   ├── package.xml
-    │   ├── urdf/ar4_palletizing.urdf.xacro
-    │   └── launch/view_robot.launch.py
-    └── ar4_bringup/           # Gazebo launch (skeleton)
-        ├── package.xml
-        └── launch/gazebo.launch.py
+    ├── ar4_moveit_config/     # MoveIt 2: SRDF, kinematics, OMPL, move_group
+    ├── ar4_control/           # ros2_control: controllers + Mock hardware
+    ├── ar4_gazebo/            # Gazebo world (track, conveyor, pallet, boxes, camera)
+    ├── ar4_bringup/           # Gazebo launch (skeleton — see ar4_gazebo)
+    └── ar4_palletizing/       # Demo app: state machine, vision node, conveyor interface
 ```
 
 ## Setup
@@ -61,18 +67,34 @@ source install/setup.bash
 # 3. View the robot in RViz
 ros2 launch ar4_description view_robot.launch.py
 
-# 4. Spawn it in Gazebo (skeleton — see docs/notes.md)
-ros2 launch ar4_bringup gazebo.launch.py
+# 4. Run the full simulation (Gazebo world + controllers)
+ros2 launch ar4_gazebo palletizing_world.launch.py
+
+# 5. MoveIt 2 planning (separate terminal)
+ros2 launch ar4_moveit_config move_group.launch.py
+ros2 launch ar4_moveit_config moveit_rviz.launch.py
+
+# 6. Palletizing demo (vision + state machine + conveyor)
+ros2 launch ar4_palletizing palletizing_demo.launch.py
 ```
+
+> First run on a fresh machine: the URDF dimensions are placeholders marked
+> `MEASURE FROM SOLIDWORKS` — measure the real values from the SolidWorks
+> assembly and fill them in before trusting any simulation result. See
+> [docs/urdf-guide.md](docs/urdf-guide.md) and [docs/setup.md](docs/setup.md).
 
 ## Roadmap
 
-1. **URDF** — robot description with all 7 joints + gripper (done, placeholder geometry)
-2. **RViz** — visualize, check joint limits and TF tree
-3. **Gazebo** — simulate the arm, track, conveyor and boxes
-4. **MoveIt 2** — planning group including `joint_7`, pick-and-place planning
-5. **ros2_control** — JointTrajectoryController (Mock Components first, real hardware later)
-6. **Palletizing demo** — vision → pick → move on track → place on pallet, in Gazebo
+1. **URDF** — robot description with all 7 joints + gripper ✅ (placeholder geometry — measure real values from SolidWorks)
+2. **RViz** — visualize, check joint limits and TF tree ✅ (`ar4_description`)
+3. **Gazebo** — simulate the arm, track, conveyor and boxes ✅ (`ar4_gazebo/palletizing_world.sdf`)
+4. **MoveIt 2** — planning group including `joint_7`, pick-and-place planning ✅ (`ar4_moveit_config`)
+5. **ros2_control** — JointTrajectoryController (Mock Components first, real hardware later) ✅ (`ar4_control`)
+6. **Palletizing demo** — vision → pick → move on track → place on pallet, in Gazebo ✅ (`ar4_palletizing`)
+
+> ✅ = code is in the repo. It has NOT been run on a ROS 2 machine yet — the
+> first `colcon build` + launch must happen on Ubuntu 24.04 with ROS 2 Jazzy,
+> then real dimensions from SolidWorks replace the placeholders.
 
 ## TODO (open items)
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Spawn the AR4 palletizing robot in Gazebo (ros_gz_sim).
 
-SKELETON: this launch starts Gazebo with an empty world, publishes the robot
-description and spawns the URDF. It is meant to be completed once the real
-meshes are exported from SolidWorks (see docs/notes.md) and the ros2_control /
-Gazebo plugins are added to the URDF.
-
-Requires: ros-jazzy-ros-gz
+NOTE: this is the OLD minimal launch (empty world, skeleton). The main
+simulation launch is now ar4_gazebo:
+    ros2 launch ar4_gazebo palletizing_world.launch.py
+which starts the full palletizing cell (track, conveyor + boxes, pallet,
+fixed camera) plus ros2_control. This file is kept for quick empty-world
+tests only.
 """
 import os
 
